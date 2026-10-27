@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CivicChamp India</title>
+<meta name="description" content="Gamified civic learning for school and college students. Prototype with sample data.">
+<style>
+:root{--green:#12805c;--green-d:#0b5a41;--green-l:#e3f4ec;--blue:#1560a8;--blue-d:#0d4377;--blue-l:#e4effa;--ink:#16293a;--mute:#52667a;--line:#d6e2ea;--bg:#f4f9fb;--card:#fff;--warn:#b3261e;--gold:#b7791f;--r:16px}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;padding-bottom:84px}
+h1,h2,h3{line-height:1.2;margin:0 0 .5rem}
+h2{font-size:1.5rem}h3{font-size:1.1rem}
+p{margin:0 0 .75rem}
+header.top{background:linear-gradient(120deg,var(--green-d),var(--blue-d));color:#fff;padding:14px 16px}
+.top .in{max-width:960px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-weight:800;font-size:1.25rem;letter-spacing:.2px}
+.brand small{display:block;font-weight:500;font-size:.75rem;opacity:.85}
+.chip{background:rgba(255,255,255,.16);border-radius:99px;padding:6px 12px;font-weight:700;font-size:.9rem;white-space:nowrap}
+main{max-width:960px;margin:auto;padding:16px}
+section{display:none}section.active{display:block}
+.grid{display:grid;gap:14px}
+@media(min-width:700px){.grid.c2{grid-template-columns:1fr 1fr}.grid.c3{grid-template-columns:repeat(3,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.card.hero{background:linear-gradient(135deg,var(--green-l),var(--blue-l));border-color:#bcd8e6}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.stat{background:#fff;border-radius:12px;padding:10px;text-align:center;border:1px solid var(--line)}
+.stat b{display:block;font-size:1.6rem;color:var(--green-d)}
+.stat span{font-size:.8rem;color:var(--mute)}
+.avatar{width:52px;height:52px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-size:1.6rem;flex:none}
+.row{display:flex;align-items:center;gap:12px}
+.bar{height:14px;background:#dbe8ee;border-radius:99px;overflow:hidden}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--blue));border-radius:99px;transition:width .5s}
+.small{font-size:.85rem;color:var(--mute)}
+.btn{min-height:48px;padding:10px 18px;border:0;border-radius:12px;font:inherit;font-weight:700;cursor:pointer;background:var(--green);color:#fff}
+.btn:hover{background:var(--green-d)}
+.btn.blue{background:var(--blue)}.btn.blue:hover{background:var(--blue-d)}
+.btn.ghost{background:#fff;color:var(--blue-d);border:2px solid var(--blue)}
+.btn.ghost:hover{background:var(--blue-l)}
+.btn:disabled{background:#9db3a9;cursor:not-allowed}
+.btn.block{width:100%}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #ffb703;outline-offset:2px}
+nav.tabs{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;z-index:10;box-shadow:0 -4px 14px rgba(0,0,0,.06)}
+nav.tabs button{flex:1;min-height:64px;border:0;background:none;font:inherit;font-size:.72rem;color:var(--mute);cursor:pointer;padding:6px 2px;font-weight:600}
+nav.tabs button span{display:block;font-size:1.3rem}
+nav.tabs button[aria-current="page"]{color:var(--green-d);background:var(--green-l);box-shadow:inset 0 3px 0 var(--green)}
+@media(min-width:800px){body{padding-bottom:0}nav.tabs{position:static;max-width:960px;margin:12px auto 0;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:none}nav.tabs button{font-size:.9rem}}
+.opt{display:block;width:100%;text-align:left;margin:8px 0;min-height:48px;padding:10px 14px;border:2px solid var(--line);border-radius:12px;background:#fff;font:inherit;cursor:pointer;color:var(--ink)}
+.opt:hover:not(:disabled){border-color:var(--blue);background:var(--blue-l)}
+.opt.right{border-color:var(--green);background:var(--green-l)}
+.opt.wrong{border-color:var(--warn);background:#fdecea}
+.explain{border-left:5px solid var(--blue);background:var(--blue-l);padding:10px 12px;border-radius:8px;margin:10px 0}
+.tag{display:inline-block;font-size:.78rem;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--green-l);color:var(--green-d)}
+.tag.blue{background:var(--blue-l);color:var(--blue-d)}
+.tag.sample{background:#fff4d6;color:#7a5200}
+.mission.done{border-color:var(--green);background:#f3fbf7}
+.mission ol{padding-left:20px;margin:6px 0 12px}
+.badge{text-align:center;padding:14px 8px;border-radius:14px;border:2px dashed var(--line);background:#fff}
+.badge .ic{font-size:2.2rem;filter:grayscale(1);opacity:.4}
+.badge.on{border:2px solid var(--gold);background:#fff9e8}
+.badge.on .ic{filter:none;opacity:1}
+.lb{list-style:none;margin:0;padding:0}
+.lb li{display:flex;align-items:center;gap:10px;padding:10px 6px;border-bottom:1px solid var(--line)}
+.lb li.me{background:var(--green-l);font-weight:800;border-radius:10px}
+.lb .rk{width:28px;font-weight:800;color:var(--blue-d)}
+.lb .nm{flex:1}
+.chart{display:flex;align-items:flex-end;gap:10px;height:170px;padding:10px 4px 0;border-bottom:2px solid var(--line)}
+.chart div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%}
+.chart i{display:block;width:100%;max-width:56px;background:linear-gradient(var(--blue),var(--green));border-radius:8px 8px 0 0;min-height:3px;transition:height .5s}
+.chart em{font-style:normal;font-size:.8rem;font-weight:700}
+.labels{display:flex;gap:10px;padding:6px 4px}
+.labels span{flex:1;text-align:center;font-size:.72rem;color:var(--mute)}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:96px;max-width:92%;padding:12px 18px;border-radius:12px;color:#fff;font-weight:700;background:var(--green-d);z-index:20;opacity:0;pointer-events:none;transition:opacity .25s}
+#toast.show{opacity:1}#toast.err{background:var(--warn)}
+footer{max-width:960px;margin:8px auto 24px;padding:0 16px;text-align:center}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+.ev{background:var(--blue-l);border:1px solid #bcd8e6;border-radius:12px;padding:12px;margin:10px 0}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.btns .btn{flex:1;min-width:150px}
+.prev{display:block;width:100%;max-height:240px;object-fit:cover;border-radius:10px;margin:8px 0;border:1px solid var(--line)}
+.fld{display:block;margin-bottom:14px}.fld>span{display:block;font-weight:700;margin-bottom:4px}
+.inp{width:100%;min-height:48px;padding:10px 12px;border:2px solid var(--line);border-radius:12px;font:inherit;background:#fff;color:var(--ink)}
+textarea.inp{min-height:110px;resize:vertical}.inp.bad{border-color:var(--warn)}
+.errm{color:var(--warn);font-weight:700;font-size:.85rem;margin:2px 0 8px}
+.note{background:#fff4d6;border:1px solid #f0d58a;border-radius:10px;padding:10px 12px;font-size:.9rem;margin:10px 0}
+.msg{font-size:.88rem;margin:4px 0}.msg.err{color:var(--warn);font-weight:600}.msg.ok{color:var(--green-d);font-weight:600}
+.camera-backdrop{position:fixed;inset:0;background:rgba(8,22,35,.82);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}.camera-panel{background:#fff;color:var(--ink);width:min(100%,620px);max-height:95vh;overflow:auto;border-radius:16px;padding:16px;box-shadow:0 18px 60px rgba(0,0,0,.35)}.camera-panel video{display:block;width:100%;max-height:60vh;min-height:180px;object-fit:contain;background:#101820;border-radius:10px}.camera-panel .btns{margin-top:12px}.camera-status{padding:10px;background:var(--blue-l);border-radius:8px;margin:8px 0}
+.pend{display:inline-block;background:#fff4d6;color:#7a5200;font-weight:700;font-size:.8rem;padding:3px 10px;border-radius:99px}
+.cl{list-style:none;padding:0;margin:0}.cl li{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:#fff}
+.filters{display:grid;gap:10px;margin:8px 0 12px}@media(min-width:600px){.filters{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){nav.tabs button{font-size:.62rem}nav.tabs button span{font-size:1.15rem}}
+</style>
+</head>
+<body>
+<header class="top"><div class="in">
+  <div class="brand">🇮🇳 CivicChamp India<small>Learn. Act. Improve your community.</small></div>
+  <div class="chip" id="hdrXP" aria-live="polite">0 XP</div>
+</div></header>
+
+<nav class="tabs" aria-label="Main navigation" id="nav">
+  <button data-go="home"><span aria-hidden="true">🏠</span>Home</button>
+  <button data-go="learn"><span aria-hidden="true">📘</span>Learn</button>
+  <button data-go="missions"><span aria-hidden="true">✅</span>Missions</button>
+  <button data-go="rewards"><span aria-hidden="true">🏆</span>Rewards</button>
+  <button data-go="impact"><span aria-hidden="true">🌱</span>Impact</button>
+  <button data-go="report"><span aria-hidden="true">📣</span>Report</button>
+  <button data-go="complaints"><span aria-hidden="true">📋</span>Complaints</button>
+</nav>
+
+<main>
+<!-- HOME -->
+<section id="home">
+  <div class="card hero">
+    <div class="row"><div class="avatar" aria-hidden="true">🧑‍🎓</div>
+      <div><h2 style="margin:0">Welcome, Student Citizen!</h2><p class="small" style="margin:0" id="levelTitle"></p></div></div>
+    <div class="stats">
+      <div class="stat"><b id="hXP">0</b><span>Total XP</span></div>
+      <div class="stat"><b id="hLvl">1</b><span>Level</span></div>
+      <div class="stat"><b id="hMis">0/5</b><span>Missions done</span></div>
+    </div>
+    <p class="small" style="margin-bottom:4px"><span id="lvlText"></span></p>
+    <div class="bar" role="progressbar" aria-label="Progress to next level" id="lvlBarWrap" aria-valuemin="0" aria-valuemax="100"><i id="lvlBar"></i></div>
+  </div>
+  <div class="grid c2" style="margin-top:14px">
+    <div class="card"><span class="tag blue">Daily civic challenge</span>
+      <h3 style="margin-top:8px" id="dailyTitle"></h3><p id="dailyText"></p>
+      <button class="btn block" id="dailyBtn">Mark challenge done (+10 XP)</button></div>
+    <div class="card"><h3>Overall progress</h3>
+      <p class="small">Missions, quiz questions and badges combined.</p>
+      <div class="bar" role="progressbar" aria-label="Overall progress" id="allBarWrap" aria-valuemin="0" aria-valuemax="100"><i id="allBar"></i></div>
+      <p class="small" id="allText" style="margin-top:6px"></p>
+      <div class="grid" style="margin-top:8px">
+        <button class="btn blue" data-go="learn">Take the quiz</button>
+        <button class="btn ghost" data-go="missions">Start a mission</button>
+      </div></div>
+  </div>
+</section>
+
+<!-- LEARN -->
+<section id="learn">
+  <h2>Learn &amp; Quiz</h2>
+  <p class="small">Answer 5 questions. Each correct answer earns 20 XP the first time you get it right.</p>
+  <div class="card" id="quizBox"></div>
+</section>
+
+<!-- MISSIONS -->
+<section id="missions">
+  <h2>Civic Missions</h2>
+  <p class="small">Complete real-life actions, then tap the button. Each mission rewards XP only once. Adding a photo or location is optional. Submissions are marked "pending verification" because this prototype has no real verification.</p>
+  <div class="note"><b>Privacy:</b> the camera and location are used only after you tap a button and your browser asks permission. Photos are not uploaded anywhere. They are kept only as a temporary preview and may disappear after a refresh. Only your locality text and rounded coordinates are saved. Camera and location need https:// or localhost.</div>
+  <div class="grid c2" id="missionList"></div>
+</section>
+
+<!-- REWARDS -->
+<section id="rewards">
+  <h2>Rewards &amp; Leaderboard</h2>
+  <div class="card hero"><div class="stats">
+    <div class="stat"><b id="rXP">0</b><span>XP</span></div>
+    <div class="stat"><b id="rLvl">1</b><span>Level</span></div>
+    <div class="stat"><b id="rBadge">0</b><span>Badges</span></div></div>
+    <p class="small" style="margin:0">Each level needs 100 XP more than the last.</p></div>
+  <h3 style="margin-top:18px">Achievement badges</h3>
+  <div class="grid c3" id="badgeList" style="grid-template-columns:repeat(2,1fr)"></div>
+  <div class="card" style="margin-top:18px"><h3>Leaderboard <span class="tag sample">Sample users</span></h3>
+    <p class="small">Other names and scores are made-up demo data. Only "You" is real.</p>
+    <ol class="lb" id="lbList"></ol></div>
+</section>
+
+<!-- IMPACT -->
+<section id="impact">
+  <h2>Community Impact</h2>
+  <p class="tag sample">Demonstration data is labelled "sample". It does not represent real-world results.</p>
+  <div class="grid c3" style="margin-top:12px">
+    <div class="card stat"><b id="iMis">0</b><span>Your missions completed</span></div>
+    <div class="card stat"><b id="iClean">0</b><span>Your self-reported cleanups<br>(unverified in this demo)</span></div>
+    <div class="card stat"><b>126</b><span>Verified cleanups <span class="tag sample">Sample</span></span></div>
+  </div>
+  <div class="card" style="margin-top:14px"><h3>Your civic activity</h3>
+    <div class="chart" id="chart" role="img" aria-label="Bar chart of your civic activity"></div><div class="labels" id="chartLbl"></div></div>
+  <div class="card" style="margin-top:14px"><h3>Locality civic scores <span class="tag sample">Sample data</span></h3>
+    <div id="locList"></div></div>
+  <div class="card" style="margin-top:14px"><h3>How verified participation improves a locality</h3>
+    <p>In a full version, a teacher, school club or ward volunteer would confirm that an activity took place. Confirmed activities would raise the locality score, show where help is needed, and let local groups plan the next cleanup.</p>
+    <p class="small" style="margin:0">In this prototype nothing is verified by anyone. Your counts show your own honour-system actions only.</p></div>
+  <div class="card" style="margin-top:14px"><h3>Possible future enhancements</h3>
+    <ul style="margin:0;padding-left:20px"><li>Teacher or volunteer verification</li><li>SMS / IVR access for low-connectivity areas</li><li>Integration with municipal and government portals</li><li>Real-time civic issue maps</li><li>Sign-in and school or college groups</li><li>Backend database and analytics</li></ul></div>
+</section>
+<!-- REPORT -->
+<section id="report">
+  <h2>Report a Civic Issue</h2>
+  <div class="note"><b>Prototype only.</b> Complaints are saved only in this browser. They are <b>not</b> sent to any municipality, government department or authority. Do not write phone numbers, ID numbers, email addresses or other sensitive personal details.</div>
+  <form class="card" id="cmpForm" novalidate>
+    <label class="fld"><span>Complaint title *</span><input class="inp" id="cTitle" maxlength="80" placeholder="e.g. Garbage bin overflowing near the bus stop"><div class="errm" id="ecTitle" hidden></div></label>
+    <label class="fld"><span>Issue category *</span><select class="inp" id="cCat"></select><div class="errm" id="ecCat" hidden></div></label>
+    <label class="fld"><span>Description *</span><textarea class="inp" id="cDesc" maxlength="600" placeholder="What is the problem, where exactly, and since when?"></textarea><div class="errm" id="ecDesc" hidden></div></label>
+    <div id="cmpEv"></div>
+    <label class="fld"><span>Urgency</span><select class="inp" id="cUrg"><option>Low</option><option selected>Medium</option><option>High</option></select></label>
+    <button class="btn block" type="submit">Submit complaint</button>
+  </form>
+  <div id="cmpOk" style="margin-top:12px"></div>
+</section>
+
+<!-- COMPLAINTS -->
+<section id="complaints">
+  <h2>My Complaints</h2>
+  <div class="note">Complaints you submit are labelled "Submitted — demo only; not sent to authorities". Statuses never change automatically because no authority is connected. Sample complaints below are invented demo data.</div>
+  <div class="card"><h3>Community overview</h3>
+    <label class="fld"><span>Show recent reports for</span><select class="inp" id="dLoc"></select></label>
+    <div id="cmpDash"></div></div>
+  <div class="card" style="margin-top:14px"><h3>My Complaints</h3>
+    <div class="filters"><label class="fld" style="margin:0"><span>Category</span><select class="inp" id="fCat"></select></label>
+    <label class="fld" style="margin:0"><span>Status</span><select class="inp" id="fSt"></select></label></div>
+    <div id="cmpDetail"></div>
+    <ul class="cl" id="cmpList"></ul></div>
+  <div class="card" style="margin-top:14px"><h3>Sample complaints <span class="tag sample">Sample data</span></h3>
+    <p class="small">Shown separately from your own complaints. Filters above apply to your complaints only.</p>
+    <ul class="cl" id="sampleList"></ul></div>
+</section>
+
+</main>
+
+<footer>
+  <button class="btn ghost" id="resetBtn">Reset demo</button>
+  <p class="small" style="margin-top:10px">CivicChamp India is a hackathon prototype. Progress, missions and complaints are saved only in this browser. No account is needed and nothing is sent to any server. Camera and location are used only if you tap a button and allow it.</p>
+</footer>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+"use strict";
+var KEY="civicchamp_india_v1", XPQ=20, XPL=100;
+
+var QUIZ=[
+ {q:"Which bin should vegetable peels and leftover food go into?",o:["Dry waste (blue) bin","Wet waste (green) bin","Hazardous waste bin","Any bin"],a:1,e:"Food scraps are wet waste. Keeping them apart from dry waste lets them be composted and makes recycling easier."},
+ {q:"You reach a zebra crossing and the signal is red for vehicles. What is the right action?",o:["Cross only at the crossing when it is safe","Run across anywhere","Wait for a friend to go first","Cross while looking at your phone"],a:0,e:"Use zebra crossings and signals, stay alert, and avoid phones while crossing. This keeps pedestrians and drivers safe."},
+ {q:"Which habit saves the most water at home?",o:["Leaving the tap running while brushing","Fixing leaking taps quickly","Washing the floor daily with a hose","Filling buckets and letting them overflow"],a:1,e:"A dripping tap can waste many litres a day. Fixing leaks and closing taps are simple, effective habits."},
+ {q:"You finish a snack in a public park and see no dustbin nearby. What should you do?",o:["Throw the wrapper on the grass","Hide it under a bench","Carry it with you until you find a bin","Burn it"],a:2,e:"Carrying litter to a bin keeps shared spaces clean. Burning waste also pollutes the air."},
+ {q:"Why should we protect benches, bus shelters and street lights?",o:["They belong to nobody","They are paid for by public money and used by everyone","Only the government needs them","They are easy to replace"],a:1,e:"Public property is funded by taxpayers and serves the whole community. Damaging it costs everyone."}
+];
+var MISSIONS=[
+ {id:"waste",icon:"♻️",t:"Segregate household waste",xp:50,d:"Separate wet, dry and hazardous waste at home for a full day.",s:["Keep two separate bins: wet and dry.","Place batteries and medicines apart as hazardous waste.","Ask your family to follow the same system."]},
+ {id:"clean",icon:"🧹",t:"Join a local cleanliness activity",xp:60,d:"Take part in a school, college or neighbourhood cleanup.",s:["Join or organise a cleanup with a teacher or adult.","Wear gloves and collect litter safely.","Sort what you collect into wet and dry waste."]},
+ {id:"water",icon:"💧",t:"Conserve water and report wastage",xp:50,d:"Save water for a day and report a leak you notice.",s:["Turn off taps while brushing and soaping.","Look for a leaking pipe or tap at home or school.","Tell the responsible adult or authority about it."]},
+ {id:"property",icon:"🚏",t:"Protect public property",xp:40,d:"Look after shared facilities and encourage others to do the same.",s:["Pick a shared item such as a bench, wall or school furniture.","Keep it clean and do not write on or damage it.","Politely remind a friend who does not."]},
+ {id:"traffic",icon:"🚦",t:"Follow traffic and pedestrian rules",xp:40,d:"Follow road rules for one whole week.",s:["Use footpaths and zebra crossings.","Wear a helmet or seatbelt when travelling.","Obey signals even when no one is watching."]}
+];
+var EV={waste:{cam:1},clean:{cam:1,loc:1},water:{cam:1,loc:1},property:{cam:1,loc:1}};
+var DAILY=[
+ {t:"Carry a reusable bottle",d:"Use a refillable bottle today instead of buying a plastic one."},
+ {t:"Pick up 5 pieces of litter",d:"Safely collect five pieces of litter and put them in a bin."},
+ {t:"Switch off unused fans and lights",d:"Turn off anything not in use at home or school."},
+ {t:"Walk, cycle or share a ride",d:"Choose a greener way to travel for one trip today."},
+ {t:"Share one civic fact",d:"Tell a friend or family member one thing you learned today."},
+ {t:"Check for water leaks",d:"Look for dripping taps and report any you find."},
+ {t:"Thank a sanitation worker",d:"A kind word recognises the people who keep your area clean."}
+];
+var BADGES=[
+ {id:"first",ic:"🌱",n:"First Step",d:"Complete 1 mission",ok:function(s){return mc(s)>=1}},
+ {id:"quiz",ic:"🧠",n:"Quiz Whiz",d:"Finish the quiz with 4 or more correct",ok:function(s){return s.quiz.done&&qScore(s)>=4}},
+ {id:"green",ic:"🌿",n:"Green Guardian",d:"Complete 3 missions",ok:function(s){return mc(s)>=3}},
+ {id:"lvl3",ic:"⭐",n:"Rising Star",d:"Reach Level 3",ok:function(s){return lvl(s.xp)>=3}},
+ {id:"champ",ic:"🏅",n:"Civic Champion",d:"Complete all 5 missions",ok:function(s){return mc(s)>=5}},
+ {id:"daily",ic:"📅",n:"Daily Doer",d:"Finish a daily challenge",ok:function(s){return s.dailyCount>=1}}
+];
+var SAMPLE_USERS=[["Aarav (sample)",420],["Meera (sample)",360],["Kabir (sample)",290],["Ananya (sample)",210],["Rohan (sample)",150],["Diya (sample)",90]];
+var LOCALITIES=[["Green Park Colony (sample)",82],["Lake View Ward (sample)",71],["Market Road Area (sample)",64],["Old Town Lane (sample)",52]];
+var LEVELNAMES=["Citizen Newcomer","Community Helper","Civic Explorer","Neighbourhood Hero","Civic Champion","City Guardian"];
+
+function fresh(){return{xp:0,quiz:{answers:{},awarded:{},done:false,cur:0},missions:{},badges:{},dailyDate:"",dailyCount:0,complaints:[],seq:0}}
+function load(){try{var r=JSON.parse(localStorage.getItem(KEY));if(r&&r.quiz){if(!Array.isArray(r.complaints))r.complaints=[];r.seq=r.seq||0;return r}}catch(e){}return fresh()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));return true}catch(e){toast("Progress could not be saved in this browser.",1);return false}}
+var S=load();
+
+function lvl(x){return Math.floor(x/XPL)+1}
+function mc(s){return Object.keys(s.missions).length}
+function qScore(s){var n=0;QUIZ.forEach(function(q,i){if(s.quiz.answers[i]===q.a)n++});return n}
+function $(id){return document.getElementById(id)}
+function today(){return new Date().toISOString().slice(0,10)}
+function esc(t){var d=document.createElement("div");d.textContent=t==null?"":t;return d.innerHTML.replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
+
+var tt;
+function toast(m,err){var t=$("toast");t.textContent=m;t.className="show"+(err?" err":"");clearTimeout(tt);tt=setTimeout(function(){t.className=""},2800)}
+
+function addXP(n){S.xp+=n;checkBadges()}
+function checkBadges(){BADGES.forEach(function(b){if(!S.badges[b.id]&&b.ok(S)){S.badges[b.id]=true;setTimeout(function(){toast("🏅 Badge unlocked: "+b.n)},900)}})}
+
+/* NAV */
+function go(id){
+  document.querySelectorAll("main section").forEach(function(s){s.classList.toggle("active",s.id===id)});
+  document.querySelectorAll("#nav button").forEach(function(b){if(b.dataset.go===id)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
+  window.scrollTo(0,0);render();
+}
+document.addEventListener("click",function(e){var g=e.target.closest("[data-go]");if(g)go(g.dataset.go)});
+
+/* HOME */
+function bar(id,wrapId,p){$(id).style.width=p+"%";$(wrapId).setAttribute("aria-valuenow",Math.round(p))}
+function renderHome(){
+  var L=lvl(S.xp),into=S.xp%XPL;
+  $("hXP").textContent=S.xp;$("hLvl").textContent=L;$("hMis").textContent=mc(S)+"/"+MISSIONS.length;
+  $("levelTitle").textContent="Level "+L+": "+LEVELNAMES[Math.min(L-1,LEVELNAMES.length-1)];
+  $("lvlText").textContent=into+" / "+XPL+" XP to Level "+(L+1);bar("lvlBar","lvlBarWrap",into);
+  var d=DAILY[new Date().getDate()%DAILY.length];
+  $("dailyTitle").textContent=d.t;$("dailyText").textContent=d.d;
+  var done=S.dailyDate===today(),btn=$("dailyBtn");
+  btn.disabled=done;btn.textContent=done?"Done today ✔ Come back tomorrow":"Mark challenge done (+10 XP)";
+  var total=MISSIONS.length+QUIZ.length+BADGES.length,got=mc(S)+Object.keys(S.quiz.awarded).length+Object.keys(S.badges).length,p=got/total*100;
+  bar("allBar","allBarWrap",p);$("allText").textContent=got+" of "+total+" goals complete ("+Math.round(p)+"%)";
+}
+$("dailyBtn").onclick=function(){
+  if(S.dailyDate===today()){toast("You already finished today's challenge.",1);return}
+  S.dailyDate=today();S.dailyCount++;addXP(10);save();toast("Great! +10 XP for today's challenge.");render();
+};
+
+/* QUIZ */
+var picked=null;
+function renderQuiz(){
+  var b=$("quizBox"),Q=S.quiz;
+  if(Q.done){
+    var sc=qScore(S),msg=sc===5?"Perfect score! You are a civic expert.":sc>=3?"Well done! You know your civic basics.":"Good start. Read the explanations and try again.";
+    b.innerHTML="<h3>Quiz complete 🎉</h3><p style='font-size:1.6rem;font-weight:800;color:var(--green-d)'>"+sc+" / "+QUIZ.length+" correct</p><p>"+msg+"</p><p class='small'>XP earned from the quiz: "+Object.keys(Q.awarded).length*XPQ+" (each question rewards XP only once)</p>"+
+    "<h3 style='margin-top:14px'>Review</h3>"+QUIZ.map(function(q,i){var ok=Q.answers[i]===q.a;return "<div class='explain' style='border-color:"+(ok?"var(--green)":"var(--warn)")+"'><b>"+(ok?"✔ ":"✘ ")+esc(q.q)+"</b><br>Answer: "+esc(q.o[q.a])+"<br><span class='small'>"+esc(q.e)+"</span></div>"}).join("")+
+    "<button class='btn block' id='retake'>Retake quiz</button>";
+    $("retake").onclick=function(){S.quiz.answers={};S.quiz.done=false;S.quiz.cur=0;picked=null;save();render()};
+    return;
+  }
+  var i=Q.cur,q=QUIZ[i],ans=Q.answers[i],answered=ans!==undefined;
+  var h="<span class='tag blue'>Question "+(i+1)+" of "+QUIZ.length+"</span><h3 style='margin-top:10px'>"+esc(q.q)+"</h3>";
+  q.o.forEach(function(o,k){
+    var c="opt";if(answered){if(k===q.a)c+=" right";else if(k===ans)c+=" wrong"}
+    h+="<button class='"+c+"' data-k='"+k+"'"+(answered?" disabled":"")+">"+String.fromCharCode(65+k)+". "+esc(o)+(answered&&k===q.a?" ✔":"")+(answered&&k===ans&&k!==q.a?" ✘":"")+"</button>";
+  });
+  if(answered){
+    var ok=ans===q.a;
+    h+="<div class='explain' role='alert'><b>"+(ok?"Correct!":"Not quite.")+"</b> "+esc(q.e)+"<br><b>"+(ok?(S.quiz.awarded[i]?"XP already awarded for this question.":""):"The right answer is "+esc(q.o[q.a])+".")+"</b></div>"+
+    "<button class='btn block' id='nextQ'>"+(i===QUIZ.length-1?"See my score":"Next question")+"</button>";
+  }
+  b.innerHTML=h;
+  b.querySelectorAll(".opt").forEach(function(btn){btn.onclick=function(){answer(i,+btn.dataset.k)}});
+  if(answered)$("nextQ").onclick=function(){if(i===QUIZ.length-1){S.quiz.done=true}else S.quiz.cur++;save();checkBadges();save();render()};
+}
+function answer(i,k){
+  if(S.quiz.answers[i]!==undefined)return;
+  S.quiz.answers[i]=k;
+  if(k===QUIZ[i].a){
+    if(!S.quiz.awarded[i]){S.quiz.awarded[i]=true;addXP(XPQ);toast("Correct! +"+XPQ+" XP")}
+    else toast("Correct! XP was already earned earlier.");
+  }else toast("Not quite. Read the explanation below.",1);
+  save();render();
+}
+
+/* EVIDENCE HELPERS (camera + location, shared by missions and complaints) */
+var drafts={},photos={},openRef=null,selLoc="",activeCameraStream=null,activeCameraKey=null;
+var CATS=["Garbage and cleanliness","Potholes and roads","Streetlights","Water supply or leakage","Drainage","Traffic and road safety","Public property damage","Pollution","Other"];
+var STATUSES=["Submitted","Under Review","In Progress","Resolved"];
+var DEMO_NOTE="Submitted — demo only; not sent to authorities";
+var PII=/(\b\d{10,12}\b|\b\d{4}\s\d{4}\s\d{4}\b|[\w.+-]+@[\w-]+\.[\w.]+)/;
+var PII_MSG="Please remove phone numbers, email addresses or ID numbers.";
+var SAMPLE_C=[
+ {ref:"SAMPLE-01",title:"Overflowing bin near the bus stop",cat:CATS[0],loc:"Market Road Area",st:"Under Review",date:"2026-10-03",urg:"High"},
+ {ref:"SAMPLE-02",title:"Large pothole outside school gate",cat:CATS[1],loc:"Green Park Colony",st:"In Progress",date:"2026-10-07",urg:"High"},
+ {ref:"SAMPLE-03",title:"Streetlight not working on lane 4",cat:CATS[2],loc:"Old Town Lane",st:"Submitted",date:"2026-10-12",urg:"Medium"},
+ {ref:"SAMPLE-04",title:"Pipe leaking near the park",cat:CATS[3],loc:"Lake View Ward",st:"Resolved",date:"2026-09-28",urg:"Medium"},
+ {ref:"SAMPLE-05",title:"Blocked drain after rain",cat:CATS[4],loc:"Green Park Colony",st:"Under Review",date:"2026-10-15",urg:"High"},
+ {ref:"SAMPLE-06",title:"Broken bench in public garden",cat:CATS[6],loc:"Lake View Ward",st:"Submitted",date:"2026-10-18",urg:"Low"}
+];
+SAMPLE_C.forEach(function(c){c.sample=true});
+
+function draft(k){return drafts[k]||(drafts[k]={url:"",lat:null,lng:null,acc:null,locality:"",msg:"",ok:true,busy:false,locErr:""})}
+function fmtC(a,b,n){return Math.abs(a).toFixed(n)+"° "+(a>=0?"N":"S")+", "+Math.abs(b).toFixed(n)+"° "+(b>=0?"E":"W")}
+function r3(x){return Math.round(x*1000)/1000}
+
+function evBlock(k,o){
+  var d=draft(k),h="";
+  if(!window.isSecureContext)h+="<p class='msg err'>This page is not on https:// or localhost, so the browser may block the camera and location.</p>";
+  h+="<label class='fld' style='margin:0 0 8px'><span>"+(o.req?"Locality / area *":"Locality / area (optional)")+"</span><input class='inp"+(d.locErr?" bad":"")+"' id='liv-"+k+"' data-liv='"+k+"' value=\""+esc(d.locality)+"\" maxlength='80' placeholder='Ward, town or village'"+(o.req?" aria-required='true'":"")+"></label>";
+  if(d.locErr)h+="<div class='errm'>"+esc(d.locErr)+"</div>";
+  if(o.loc){
+    h+="<p class='small' style='margin:6px 0'>Location is optional. Your browser asks permission only when you tap the button. We use it to show your coordinates here. Nothing is uploaded. If you say no, just type your locality above.</p>"+
+    "<div class='btns'><button type='button' class='btn ghost' data-act='geo' data-k='"+k+"'"+(d.busy?" disabled":"")+">"+(d.busy?"Finding location…":"📍 Use My Location")+"</button></div>";
+    if(d.lat!==null)h+="<p class='msg ok'>Coordinates: "+fmtC(d.lat,d.lng,5)+(d.acc?" (about ±"+Math.round(d.acc)+" m)":"")+"</p>";
+  }
+  if(o.cam){
+    h+="<input type='file' accept='image/*' capture='environment' hidden id='cam-"+k+"' data-file='"+k+"'>";
+    if(o.upload)h+="<input type='file' accept='image/*' hidden id='up-"+k+"' data-file='"+k+"'>";
+    if(d.url)h+="<img class='prev' src='"+d.url+"' alt='Preview of the attached photo'>";
+    h+="<div class='btns'><button type='button' class='btn blue' data-act='cam' data-k='"+k+"'>📷 "+(d.url?"Retake photo":(o.upload?"Take Photo":"Capture Photo"))+"</button>";
+    if(o.upload)h+="<button type='button' class='btn ghost' data-act='up' data-k='"+k+"'>🖼️ "+(d.url?"Replace photo":"Upload Photo")+"</button>";
+    if(d.url)h+="<button type='button' class='btn ghost' data-act='rm' data-k='"+k+"'>Remove photo</button>";
+    h+="</div><p class='small' style='margin:4px 0'>Photo is optional and stays on this device. It is not uploaded and may be gone after a refresh. On a laptop, Take Photo opens a live webcam preview when supported; you can use Upload Photo if camera access is unavailable.</p>";
+  }
+  if(d.msg)h+="<p class='msg "+(d.ok?"ok":"err")+"' role='status'>"+esc(d.msg)+"</p>";
+  return h;
+}
+function refreshEv(k){if(k==="cmp")renderCmpEv();else renderMissions()}
+function setPhoto(k,f){
+  var d=draft(k);
+  if(d.url){URL.revokeObjectURL(d.url);d.url=""}
+  if(f){
+    if(!/^image\//.test(f.type)){d.msg="That file is not an image. Choose a photo or continue without one.";d.ok=false}
+    else if(f.size>15*1048576){d.msg="That photo is too large (over 15 MB). Try a smaller one or continue without it.";d.ok=false}
+    else{d.url=URL.createObjectURL(f);d.msg="Photo attached. You can retake or remove it.";d.ok=true}
+  }else{d.msg="Photo removed. You can continue without one.";d.ok=true}
+  refreshEv(k);
+}
+function getLoc(k){
+  var d=draft(k);
+  if(!navigator.geolocation){d.msg="Location is not available on this browser. Please type your locality instead.";d.ok=false;refreshEv(k);return}
+  d.busy=true;d.msg="Waiting for your permission…";d.ok=true;refreshEv(k);
+  try{
+  navigator.geolocation.getCurrentPosition(function(p){
+    d.busy=false;d.lat=p.coords.latitude;d.lng=p.coords.longitude;d.acc=p.coords.accuracy;d.ok=true;
+    d.msg="Location added. Please also type the area name above.";refreshEv(k);
+  },function(er){
+    d.busy=false;d.ok=false;
+    d.msg=er.code===1?"Location permission was denied. That is fine: type your locality above and continue.":er.code===3?"Finding your location took too long. Type your locality or try again.":"Your location could not be found. Type your locality instead.";
+    if(!window.isSecureContext)d.msg+=" Location needs https:// or localhost.";
+    refreshEv(k);
+  },{timeout:12000,maximumAge:60000});
+  }catch(x){d.busy=false;d.ok=false;d.msg="Location failed. Type your locality instead.";refreshEv(k)}
+}
+function stopActiveCamera(){
+  if(activeCameraStream){activeCameraStream.getTracks().forEach(function(t){t.stop()});activeCameraStream=null}
+  activeCameraKey=null;
+}
+function closeCameraDialog(){
+  stopActiveCamera();
+  var modal=$("cameraDialog");if(modal)modal.remove();
+}
+function openCamera(k){
+  if(!window.isSecureContext||!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    var d=draft(k);d.msg="Live camera is unavailable in this browser context. Use Upload Photo to choose an image instead.";d.ok=false;refreshEv(k);
+    var fallback=$("up-"+k)||$("cam-"+k);if(fallback)fallback.click();return;
+  }
+  closeCameraDialog();activeCameraKey=k;
+  var modal=document.createElement("div");modal.className="camera-backdrop";modal.id="cameraDialog";modal.setAttribute("role","dialog");modal.setAttribute("aria-modal","true");modal.setAttribute("aria-labelledby","cameraTitle");
+  modal.innerHTML="<div class='camera-panel'><h2 id='cameraTitle'>Take a photo</h2><p class='small'>Allow camera access when your browser asks. Your photo stays in this browser and is not uploaded.</p><video id='cameraLivePreview' autoplay playsinline muted></video><p class='camera-status' id='cameraStatus' role='status'>Connecting to camera…</p><div class='btns'><button type='button' class='btn blue' id='cameraCapture' disabled>Capture Photo</button><button type='button' class='btn ghost' id='cameraFallback'>Upload Photo Instead</button><button type='button' class='btn ghost' id='cameraCancel'>Cancel</button></div><canvas id='cameraCanvas' hidden></canvas></div>";
+  document.body.appendChild(modal);
+  $("cameraCancel").onclick=closeCameraDialog;
+  modal.addEventListener("click",function(ev){if(ev.target===modal)closeCameraDialog()});
+  $("cameraFallback").onclick=function(){closeCameraDialog();var input=$("up-"+k)||$("cam-"+k);if(input)input.click()};
+  $("cameraCapture").onclick=function(){
+    var video=$("cameraLivePreview"),canvas=$("cameraCanvas");
+    if(!video.videoWidth||!video.videoHeight){$("cameraStatus").textContent="Camera is not ready yet. Please wait a moment.";return}
+    canvas.width=video.videoWidth;canvas.height=video.videoHeight;
+    canvas.getContext("2d").drawImage(video,0,0,canvas.width,canvas.height);
+    canvas.toBlob(function(blob){
+      if(!blob){$("cameraStatus").textContent="Could not capture this photo. Please try again or upload an image.";return}
+      var file=new File([blob],"civicchamp-photo-"+Date.now()+".jpg",{type:"image/jpeg"});
+      closeCameraDialog();setPhoto(k,file);
+    },"image/jpeg",0.9);
+  };
+  navigator.mediaDevices.getUserMedia({video:{facingMode:"user"},audio:false}).then(function(stream){
+    if(!$("cameraDialog")){stream.getTracks().forEach(function(t){t.stop()});return}
+    activeCameraStream=stream;var video=$("cameraLivePreview");video.srcObject=stream;
+    video.onloadedmetadata=function(){video.play().then(function(){$("cameraCapture").disabled=false;$("cameraStatus").textContent="Camera ready. Position yourself and capture the photo."}).catch(function(){$("cameraStatus").textContent="The preview could not start. Check browser camera permissions or use Upload Photo."})};
+  }).catch(function(err){
+    if(!$("cameraDialog"))return;
+    var message=err&&err.name==="NotAllowedError"?"Camera permission was denied. Allow camera access in your browser's site settings, then try again.":err&&err.name==="NotFoundError"?"No camera was found. Connect a webcam or use Upload Photo.":err&&err.name==="NotReadableError"?"The camera may be in use by another application. Close it there and try again.":"Could not open the camera ("+(err&&err.name?err.name:"unknown error")+"). Check browser permissions or use Upload Photo.";
+    $("cameraStatus").textContent=message;$("cameraCapture").disabled=true;
+  });
+}
+document.addEventListener("click",function(e){
+  var b=e.target.closest("[data-act]");if(!b)return;
+  var a=b.dataset.act,k=b.dataset.k;
+  if(a==="cam")openCamera(k);
+  else if(a==="up"&&$("up-"+k))$("up-"+k).click();
+  else if(a==="rm")setPhoto(k,null);
+  else if(a==="geo")getLoc(k);
+  else if(a==="open"){openRef=k;renderComplaints();$("cmpDetail").scrollIntoView()}
+  else if(a==="close"){openRef=null;renderComplaints()}
+});
+window.addEventListener("pagehide",stopActiveCamera);
+document.addEventListener("change",function(e){var i=e.target;if(i.dataset&&i.dataset.file&&i.files&&i.files[0])setPhoto(i.dataset.file,i.files[0])});
+document.addEventListener("input",function(e){
+  var t=e.target;
+  if(t.dataset&&t.dataset.liv){var d=draft(t.dataset.liv);d.locality=t.value;d.locErr="";t.classList.remove("bad")}
+  else if(t.id&&$("e"+t.id))fe(t.id,"");
+});
+function resetEv(){
+  Object.keys(drafts).forEach(function(k){if(drafts[k].url)URL.revokeObjectURL(drafts[k].url)});
+  Object.keys(photos).forEach(function(k){URL.revokeObjectURL(photos[k])});
+  drafts={};photos={};openRef=null;selLoc="";$("cmpOk").innerHTML="";$("cmpForm").reset();
+}
+
+/* MISSIONS */
+function renderMissions(){
+  $("missionList").innerHTML=MISSIONS.map(function(m){
+    var rec=S.missions[m.id],done=!!rec,o=EV[m.id]||{};
+    var h="<article class='card mission"+(done?" done":"")+"'><div class='row'><div style='font-size:2rem' aria-hidden='true'>"+m.icon+"</div><div><h3 style='margin:0'>"+esc(m.t)+"</h3><span class='tag'>+"+m.xp+" XP</span></div></div>"+
+    "<p style='margin-top:10px'>"+esc(m.d)+"</p><b class='small'>Instructions</b><ol>"+m.s.map(function(x){return "<li>"+esc(x)+"</li>"}).join("")+"</ol>";
+    if(done)h+=doneEv(m.id,rec);
+    else if(o.cam||o.loc)h+="<div class='ev'><b>Add evidence (optional)</b>"+evBlock("m-"+m.id,o)+"</div>";
+    return h+"<button class='btn block"+(done?"":" blue")+"' data-m='"+m.id+"'"+(done?" disabled":"")+">"+(done?"Completed ✔":"I completed this mission")+"</button></article>";
+  }).join("");
+  document.querySelectorAll("[data-m]").forEach(function(b){b.onclick=function(){completeMission(b.dataset.m)}});
+}
+function doneEv(id,rec){
+  var r=(rec&&typeof rec==="object")?rec:{},p=photos["m-"+id];
+  var h="<div class='ev'><span class='pend'>Evidence submitted — pending verification</span><p class='small' style='margin:6px 0'>Nothing here has been independently verified.</p>";
+  if(p)h+="<img class='prev' src='"+p+"' alt='Photo attached to this mission'>";
+  h+="<p class='small' style='margin:0'>"+(r.photo?(p?"Photo attached.":"A photo was attached, but its preview is not kept after a refresh."):"No photo attached.")+"</p>";
+  if(r.locality)h+="<p class='small' style='margin:0'>Locality: <b>"+esc(r.locality)+"</b></p>";
+  if(r.lat!=null)h+="<p class='small' style='margin:0'>Approximate coordinates: "+fmtC(r.lat,r.lng,3)+"</p>";
+  if(!r.locality&&r.lat==null)h+="<p class='small' style='margin:0'>No location added.</p>";
+  return h+"</div>";
+}
+function completeMission(id){
+  if(S.missions[id]){toast("You already earned XP for this mission.",1);return}
+  var m=MISSIONS.filter(function(x){return x.id===id})[0],k="m-"+id,d=draft(k);
+  S.missions[id]={ts:Date.now(),photo:!!d.url,locality:d.locality.trim().slice(0,80),lat:d.lat===null?null:r3(d.lat),lng:d.lng===null?null:r3(d.lng)};
+  if(d.url)photos[k]=d.url;
+  delete drafts[k];
+  addXP(m.xp);save();toast("Mission complete! +"+m.xp+" XP. Evidence is pending verification.");render();
+}
+
+/* COMPLAINTS */
+function fe(id,msg){var el=$(id),er=$("e"+id);if(!el||!er)return false;if(msg){el.classList.add("bad");er.textContent=msg;er.hidden=false}else{el.classList.remove("bad");er.textContent="";er.hidden=true}return !!msg}
+function renderCmpEv(){$("cmpEv").innerHTML=evBlock("cmp",{cam:1,loc:1,upload:1,req:1})}
+function fillSelects(){
+  function f(id,first,arr){$(id).innerHTML="<option value=''>"+first+"</option>"+arr.map(function(a){return "<option>"+esc(a)+"</option>"}).join("")}
+  f("fCat","All categories",CATS);f("fSt","All statuses",STATUSES);f("cCat","Choose a category",CATS);
+  $("fCat").onchange=$("fSt").onchange=renderComplaints;
+  $("dLoc").onchange=function(){selLoc=this.value;renderComplaints()};
+  $("cmpForm").addEventListener("submit",submitCmp);
+}
+function submitCmp(e){
+  e.preventDefault();$("cmpOk").innerHTML="";
+  var t=$("cTitle").value.trim(),c=$("cCat").value,ds=$("cDesc").value.trim(),d=draft("cmp"),loc=d.locality.trim(),first=null,bad=0;
+  function chk(id,msg){if(fe(id,msg)){bad++;if(!first)first=id}}
+  chk("cTitle",t.length<5?"Enter a short title (at least 5 characters).":PII.test(t)?PII_MSG:"");
+  chk("cCat",c?"":"Choose an issue category.");
+  chk("cDesc",ds.length<15?"Describe the problem in at least 15 characters.":PII.test(ds)?PII_MSG:"");
+  d.locErr=loc.length<2?"Enter the area, ward, town or village. You can type it even if you use the location button.":"";
+  if(d.locErr){bad++;if(!first)first="liv-cmp"}
+  if(bad){renderCmpEv();toast("Please fix the highlighted fields.",1);if($(first))$(first).focus();return}
+  var seq=(S.seq||0)+1,ref="CIV-"+new Date().getFullYear()+"-"+String(seq).padStart(4,"0");
+  var rec={ref:ref,title:t,cat:c,desc:ds,loc:loc,urg:$("cUrg").value,date:new Date().toISOString(),st:"Submitted",photo:!!d.url,lat:d.lat===null?null:r3(d.lat),lng:d.lng===null?null:r3(d.lng)};
+  S.complaints.unshift(rec);S.seq=seq;
+  if(!save()){S.complaints.shift();S.seq=seq-1;$("cmpOk").innerHTML="<div class='note' role='alert'>Your complaint could not be saved because browser storage is unavailable or full. Free some space, or turn off private browsing, then try again.</div>";return}
+  if(d.url)photos["c-"+ref]=d.url;
+  delete drafts.cmp;$("cmpForm").reset();renderCmpEv();
+  $("cmpOk").innerHTML="<div class='ev' role='status' style='background:var(--green-l)'><b>✔ Complaint saved as "+ref+"</b><p style='margin:6px 0'>"+DEMO_NOTE+". It is stored only in this browser.</p><button type='button' class='btn' data-go='complaints'>View My Complaints</button></div>";
+  $("cmpOk").scrollIntoView();toast("Complaint "+ref+" saved (demo only).");
+}
+function stText(c){return c.sample?c.st+" (sample)":(c.st==="Submitted"?DEMO_NOTE:c.st)}
+function fdate(c){return new Date(c.date).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"})}
+function item(c){
+  return "<li><div class='row' style='justify-content:space-between;flex-wrap:wrap'><b>"+esc(c.ref)+"</b>"+(c.sample?"<span class='tag sample'>Sample data</span>":"<span class='tag'>Your report</span>")+"</div>"+
+  "<div style='font-weight:600;margin:4px 0'>"+esc(c.title)+"</div><div class='small'>"+esc(c.cat)+" | "+esc(c.loc)+" | "+fdate(c)+"</div>"+
+  "<div style='margin:6px 0'><span class='pend'>"+esc(stText(c))+"</span></div><button class='btn ghost' data-act='open' data-k='"+esc(c.ref)+"'>View details</button></li>";
+}
+function detailHTML(c){
+  var h="<div class='ev' style='background:#fff'><div class='row' style='justify-content:space-between'><h3 style='margin:0'>"+esc(c.ref)+"</h3><button class='btn ghost' data-act='close'>Close</button></div>"+(c.sample?"<span class='tag sample'>Sample data</span>":"")+
+  "<p><b>"+esc(c.title)+"</b></p><p class='small' style='margin:0'>Category: "+esc(c.cat)+"</p><p class='small' style='margin:0'>Urgency: "+esc(c.urg)+"</p><p class='small' style='margin:0'>Locality: "+esc(c.loc)+"</p><p class='small' style='margin:0'>Date: "+fdate(c)+"</p><p style='margin:6px 0'><span class='pend'>"+esc(stText(c))+"</span></p>";
+  if(c.sample)return h+"<p class='small'>This is invented demo data. No description, photo or location exists.</p></div>";
+  h+="<p>"+esc(c.desc)+"</p>";
+  var p=photos["c-"+c.ref];
+  if(p)h+="<img class='prev' src='"+p+"' alt='Photo attached to this complaint'>";
+  else h+="<p class='small'>"+(c.photo?"A photo was attached, but its preview is not kept after a refresh.":"No photo attached.")+"</p>";
+  if(c.lat!=null)h+="<p class='small'>Approximate coordinates: "+fmtC(c.lat,c.lng,3)+"</p>";
+  return h+"<p class='small' style='margin:0'>Your photo and coordinates are shown only to you on this device. They are not shared publicly.</p></div>";
+}
+function cnt(list,arr,key){return arr.map(function(a){var n=list.filter(function(c){return c[key]===a}).length;return n?"<span class='tag blue'>"+esc(a)+": "+n+"</span> ":""}).join("")||"<span class='small'>None yet</span>"}
+function dashBlock(list,title,sample){
+  return "<div class='ev' style='background:"+(sample?"#fff9e8":"var(--green-l)")+"'><b>"+title+"</b> "+(sample?"<span class='tag sample'>Sample data</span>":"")+"<p style='margin:6px 0'>Total complaints: <b>"+list.length+"</b></p><p class='small' style='margin:4px 0'>By category</p><p style='margin:0 0 6px'>"+cnt(list,CATS,"cat")+"</p><p class='small' style='margin:4px 0'>By status</p><p style='margin:0'>"+cnt(list,STATUSES,"st")+"</p></div>";
+}
+function renderComplaints(){
+  var fc=$("fCat").value,fs=$("fSt").value;
+  var mine=S.complaints.filter(function(c){return(!fc||c.cat===fc)&&(!fs||c.st===fs)});
+  $("cmpList").innerHTML=!S.complaints.length?"<li><b>No complaints yet.</b><p class='small' style='margin:4px 0 8px'>When you report an issue it will appear here. Complaints are saved in this browser only.</p><button class='btn' data-go='report'>Report an issue</button></li>":
+    mine.length?mine.map(item).join(""):"<li>No complaints match these filters. Change the category or status filter.</li>";
+  $("sampleList").innerHTML=SAMPLE_C.map(item).join("");
+  var all=S.complaints.concat(SAMPLE_C),oc=all.filter(function(c){return c.ref===openRef})[0];
+  $("cmpDetail").innerHTML=oc?detailHTML(oc):"";
+  var locs=[];all.forEach(function(c){if(!locs.some(function(l){return l.toLowerCase()===c.loc.toLowerCase()}))locs.push(c.loc)});
+  $("dLoc").innerHTML="<option value=''>All localities</option>"+locs.map(function(l){return "<option"+(l===selLoc?" selected":"")+">"+esc(l)+"</option>"}).join("");
+  var rec=all.filter(function(c){return!selLoc||c.loc.toLowerCase()===selLoc.toLowerCase()}).sort(function(a,b){return a.date<b.date?1:-1}).slice(0,5);
+  $("cmpDash").innerHTML="<div class='grid c2'>"+dashBlock(S.complaints,"Your complaints",false)+dashBlock(SAMPLE_C,"Community overview",true)+"</div>"+
+   "<h4 style='margin:14px 0 6px'>Recent reports"+(selLoc?" in "+esc(selLoc):"")+"</h4><ul class='cl'>"+(rec.length?rec.map(function(c){return "<li><b>"+esc(c.title)+"</b> <span class='tag "+(c.sample?"sample":"")+"'>"+(c.sample?"Sample data":"Your report")+"</span><div class='small'>"+esc(c.cat)+" | "+esc(stText(c))+"</div></li>"}).join(""):"<li>No reports for this locality yet.</li>")+"</ul><p class='small'>Only titles, categories and statuses are shown. Photos and coordinates are never listed here.</p>";
+}
+
+/* REWARDS */
+function renderRewards(){
+  $("rXP").textContent=S.xp;$("rLvl").textContent=lvl(S.xp);$("rBadge").textContent=Object.keys(S.badges).length;
+  $("badgeList").innerHTML=BADGES.map(function(b){var on=S.badges[b.id];
+    return "<div class='badge"+(on?" on":"")+"'><div class='ic' aria-hidden='true'>"+b.ic+"</div><b>"+b.n+"</b><div class='small'>"+b.d+"</div><div class='small'><b>"+(on?"Unlocked ✔":"Locked")+"</b></div></div>"}).join("");
+  var list=SAMPLE_USERS.map(function(u){return{n:u[0],x:u[1],me:false}});
+  list.push({n:"You",x:S.xp,me:true});
+  list.sort(function(a,b){return b.x-a.x||(a.me?-1:1)});
+  $("lbList").innerHTML=list.map(function(u,i){return "<li class='"+(u.me?"me":"")+"'><span class='rk'>"+(i+1)+"</span><span class='nm'>"+esc(u.n)+"</span><span>"+u.x+" XP</span></li>"}).join("");
+}
+
+/* IMPACT */
+function renderImpact(){
+  $("iMis").textContent=mc(S);$("iClean").textContent=S.missions.clean?1:0;
+  var data=[["Missions",mc(S),MISSIONS.length],["Quiz",qScore(S),QUIZ.length],["Badges",Object.keys(S.badges).length,BADGES.length],["Daily",Math.min(S.dailyCount,7),7]];
+  $("chart").innerHTML=data.map(function(d){var p=d[1]/d[2]*100;return "<div><em>"+d[1]+"/"+d[2]+"</em><i style='height:"+p*1.2+"px'></i></div>"}).join("");
+  $("chartLbl").innerHTML=data.map(function(d){return "<span>"+d[0]+"</span>"}).join("");
+  $("locList").innerHTML=LOCALITIES.map(function(l){return "<div style='margin-bottom:12px'><div class='row' style='justify-content:space-between'><b>"+esc(l[0])+"</b><span>"+l[1]+"/100</span></div><div class='bar' role='progressbar' aria-valuenow='"+l[1]+"' aria-valuemin='0' aria-valuemax='100' aria-label='"+esc(l[0])+" score'><i style='width:"+l[1]+"%'></i></div></div>"}).join("")+"<p class='small'>Sample scores for illustration only.</p>";
+}
+
+function render(){
+  $("hdrXP").textContent="Lv "+lvl(S.xp)+" · "+S.xp+" XP";
+  renderHome();renderQuiz();renderMissions();renderRewards();renderImpact();renderComplaints();renderCmpEv();
+}
+
+$("resetBtn").onclick=function(){
+  if(confirm("Reset all demo progress in this browser?")){resetEv();S=fresh();try{localStorage.removeItem(KEY)}catch(e){}save();go("home");toast("Demo reset. Start fresh!")}
+};
+
+fillSelects();go("home");
+})();
+</script>
+</body>
+</html>
